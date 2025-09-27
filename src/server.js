@@ -122,12 +122,14 @@ class XtreamRedistributor {
                     admin_api: '/admin',
                     player_api: '/player_api.php',
                     alternative_api: '/api.php',
+                    app_auth: '/api.php?action=auth&e=<encrypted_payload>',
                     documentation: '/api-docs',
                     health_check: '/health'
                 },
                 features: [
                     'Autenticação JWT para admins',
                     'Autenticação de usuários com MySQL',
+                    'Autenticação criptografada OpenSSL para apps',
                     'Sistema de expiração automática',
                     'Controle de conexões simultâneas',
                     'Logs detalhados de acesso',

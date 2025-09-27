@@ -1,17 +1,24 @@
 const express = require('express');
 const AuthMiddleware = require('../middleware/auth');
+const AppAuthMiddleware = require('../middleware/appAuth');
 const XtreamController = require('../controllers/XtreamController');
 
 const router = express.Router();
 const xtreamController = new XtreamController();
 
-// Aplicar autenticação em todas as rotas
+// Middleware de autenticação do app (para requisições com campo 'e')
+router.use('/api.php', AppAuthMiddleware.authenticateApp);
+router.use('/api.php', AppAuthMiddleware.handleAppActions);
+
+// API alternativa (compatível com apps que usam criptografia)
+router.get('/api.php', xtreamController.handleAlternativeAPI.bind(xtreamController));
+router.post('/api.php', xtreamController.handleAlternativeAPI.bind(xtreamController));
+
+// Aplicar autenticação tradicional nas demais rotas
 router.use(AuthMiddleware.authenticateUser);
 
 // API principal do Xtream
 router.get('/player_api.php', xtreamController.handlePlayerAPI.bind(xtreamController));
-router.get('/api.php', xtreamController.handleAlternativeAPI.bind(xtreamController));
-router.post('/api.php', xtreamController.handleAlternativeAPI.bind(xtreamController));
 
 // Rotas com prefixo /api/
 router.get('/api/player_api.php', xtreamController.handlePlayerAPI.bind(xtreamController));

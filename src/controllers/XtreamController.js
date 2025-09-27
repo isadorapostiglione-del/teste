@@ -201,25 +201,35 @@ class XtreamController {
      * API de autenticação alternativa (compatível com UniTV)
      */
     async handleAlternativeAPI(req, res) {
-        const { action, username, password } = req.query;
+        const { action, username, password, e, t, ua } = req.query;
         
-        logger.info(`🔐 Alternative API Request: ${action || 'unknown'} - User: ${username || 'N/A'}`);
+        logger.info(`🔐 Alternative API Request: ${action || 'unknown'} - User: ${username || 'N/A'} - Encrypted: ${e ? 'Yes' : 'No'}`);
         
         switch (action) {
             case 'auth':
-                // Formato exato esperado pelo UniTV
-                const authResponse = {
-                    server: `http://${req.get('host')}`,
-                    username: username || 'authenticated_user',
-                    password: 'authenticated',
-                    success: true,
-                    validity_days: 365,
-                    ua: 'UniTV/4.14.4',
-                    message: 'Authentication successful'
-                };
-                
-                logger.info(`✅ Autenticação aceita para UniTV`);
-                res.json(authResponse);
+                // Se tem campo 'e', é autenticação criptografada do app
+                if (e) {
+                    // Será processado pelo AppAuthMiddleware
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Use middleware de autenticação do app',
+                        error: 'USE_APP_AUTH_MIDDLEWARE'
+                    });
+                } else {
+                    // Formato simples para UniTV e similares
+                    const authResponse = {
+                        server: `http://${req.get('host')}`,
+                        username: username || 'authenticated_user',
+                        password: 'authenticated',
+                        success: true,
+                        validity_days: 365,
+                        ua: ua || 'UniTV/4.14.4',
+                        message: 'Authentication successful'
+                    };
+                    
+                    logger.info(`✅ Autenticação simples aceita - User: ${username}`);
+                    res.json(authResponse);
+                }
                 break;
                 
             case 'get_servers':
