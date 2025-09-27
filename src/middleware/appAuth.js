@@ -10,7 +10,7 @@ class AppAuthMiddleware {
     /**
      * Middleware para autenticação do app via campo 'e' criptografado
      */
-    async authenticateApp(req, res, next) {
+    authenticateApp = async (req, res, next) => {
         try {
             const { action, t, e, ua } = req.query;
             
@@ -114,7 +114,7 @@ class AppAuthMiddleware {
     /**
      * Middleware para outras ações do app (get_servers, etc.)
      */
-    async handleAppActions(req, res, next) {
+    handleAppActions = async (req, res, next) => {
         try {
             const { action } = req.query;
 

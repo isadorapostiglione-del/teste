@@ -66,8 +66,7 @@ class AppAuthTester {
         console.log('🧪 Testando autenticação do app...\n');
 
         const testCases = [
-            { username: 'ABC1234', password: 'test123' },
-            { username: 'XYZ5678', password: 'password456' },
+            { username: 'ZBB2147', password: 'test123' },
             { username: 'ADMIN001', password: 'admin123456' }
         ];
 
@@ -77,7 +76,7 @@ class AppAuthTester {
             const encryptedPayload = this.generateTestPayload(testCase.username, testCase.password);
             console.log(`🔒 Payload criptografado: ${encryptedPayload.substring(0, 100)}...`);
             
-            const testUrl = `http://localhost:3000/api.php?action=auth&t=7&e=${encryptedPayload}`;
+            const testUrl = `http://localhost:3000/api.php?action=auth&t=7&ua=UniTV/1.0&e=${encryptedPayload}`;
             console.log(`🌐 URL de teste: ${testUrl.substring(0, 150)}...\n`);
             
             // Aqui você pode fazer a requisição HTTP real se quiser
@@ -90,6 +89,23 @@ class AppAuthTester {
         console.log('1. Inicie o servidor: npm start');
         console.log('2. Use as URLs geradas acima em um cliente HTTP');
         console.log('3. Verifique os logs do servidor para debug');
+        
+        // Teste real com fetch se disponível
+        if (typeof fetch !== 'undefined') {
+            console.log('\n🌐 Fazendo teste real...');
+            try {
+                const testCase = testCases[0];
+                const encryptedPayload = this.generateTestPayload(testCase.username, testCase.password);
+                const testUrl = `http://localhost:3000/api.php?action=auth&t=7&ua=UniTV/1.0&e=${encryptedPayload}`;
+                
+                const response = await fetch(testUrl);
+                const result = await response.json();
+                
+                console.log('📊 Resultado do teste:', JSON.stringify(result, null, 2));
+            } catch (error) {
+                console.log('❌ Erro no teste:', error.message);
+            }
+        }
     }
 }
 

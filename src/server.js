@@ -45,6 +45,12 @@ class XtreamRedistributor {
         const limiter = rateLimit({
             windowMs: 15 * 60 * 1000, // 15 minutos
             max: 1000, // Limite de 1000 requests por IP
+            standardHeaders: true,
+            legacyHeaders: false,
+            keyGenerator: (req) => {
+                // Use X-Forwarded-For se disponível, senão IP direto
+                return req.ip || req.connection.remoteAddress || 'unknown';
+            },
             message: {
                 error: 'Rate limit excedido',
                 message: 'Muitas requisições. Tente novamente em 15 minutos.'
@@ -56,8 +62,8 @@ class XtreamRedistributor {
         this.app.use(express.json({ limit: '10mb' }));
         this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         
-        // Trust proxy
-        this.app.set('trust proxy', true);
+        // Trust proxy - configuração mais específica
+        this.app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
         
         // Log de acesso
         this.app.use(AuthMiddleware.logAccess);
